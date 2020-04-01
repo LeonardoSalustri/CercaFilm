@@ -17,11 +17,61 @@
     <!-- Custom styles for this template -->
     <link href="../stylesheets/style.css" rel="stylesheet">
   </head>
+  
 
   <body>
 
+    <script>
+      var ws = new WebSocket("ws://localhost:3000/ws"); 
+      ws.onopen=()=>{
+        console.log("Websocket open");
+      };
+      function checkname(){
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+        var conferma = document.getElementById("conferma").value;
+        var email = document.getElementById("email").value;
+        var email_reg_exp = /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-]{2,})+.)+([a-zA-Z0-9]{2,})+$/;
+        //Effettua il controllo sul campo NOME
+        if ((username == "") || (username == "undefined")) {
+          alert("Il campo user è obbligatorio.");
+          document.getElementById("username").focus();
+        }
+        //Effettua il controllo sul campo PASSWORD
+        else if ((password == "") || (password == "undefined") || (password.length<8)) {
+          alert("Password non adatta.");
+          document.getElementById("password").value = "";
+        }
+        //Effettua il controllo sul campo CONFERMA PASSWORD
+        else if ((conferma == "") || (conferma == "undefined")) {
+          alert("Il campo Conferma password è obbligatorio.");
+          document.getElementById("conferma").value = "";
+        }
+        //Verifica l'uguaglianza tra i campi PASSWORD e CONFERMA PASSWORD
+        else if (password != conferma) {
+          alert("La password confermata è diversa da quella scelta, controllare.");
+          document.getElementById("conferma").value = "";
+        }
+        else if (!email_reg_exp.test(email) || (email == "") || (email == "undefined")) {
+          alert("Inserire un indirizzo email corretto.");
+          document.getElementById("email").value = "";
+        } 
+        else{
+        ws.send(document.getElementById("username").value);
+        ws.onmessage=(msg)=>{
+          if(msg.data==="ok"){
+            document.getElementById("esiste").innerHTML="OK";
+          }
+          else{
+          document.getElementById("esiste").innerHTML="Nome utente già esistente";
+        }
+      }
+    }
+  }
+    </script>
+
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">Navbar</a>
+      <a class="navbar-brand" href="#">CercaFilm</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -32,18 +82,7 @@
             <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" href="#">Disabled</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown01">
-              <a class="dropdown-item" href="#">Action</a>
-              <a class="dropdown-item" href="#">Another action</a>
-              <a class="dropdown-item" href="#">Something else here</a>
-            </div>
+            <a class="nav-link" href="#">About Us</a>
           </li>
         </ul>
       </div>
@@ -52,25 +91,27 @@
     <main role="main" class="container">
 
       <div class="starter-template">
-        <form action="/register" method="POST">
-          <div class="form-group">
-            <label for="nome">Nome</label>
-              <input type="nome" class="form-control" id="nome" name="nome">
-              <small id="nome" class="form-text text-muted"></small>
-            </div>
+        <form action="/registration" method="POST">
             <div class="form-group">
               <label for="username">Nome Utente</label>
                 <input type="username" class="form-control" id="username" name="username">
                 <small id="username" class="form-text text-muted">Il nome utente deve essere unico</small>
-          </div>
+                <p></p>
+                <p id="esiste"></p>
+            </div>
             <div class="form-group">
               <label for="email">Email address</label>
               <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email">
-              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+              <small id="emailHelp" class="form-text text-muted">Non condivideremo mai la tua e-mail con quaalcuno.</small>
             </div>
             <div class="form-group">
               <label for="password">Password</label>
               <input type="password" class="form-control" id="password" name="password">
+              <small id="emailHelp" class="form-text text-muted">Min. 8 caratteri, di cui almeno un numero e un segno di punteggiatura.</small>
+            </div>
+            <div class="form-group">
+              <label for="password">Conferma Password</label>
+              <input type="password" class="form-control" id="conferma" name="conferma">
             </div>
             <div class="form-check">
               <input class="form-check-input" type="checkbox" value="" id="uomo">
@@ -84,6 +125,7 @@
                 Donna
               </label>
             </div>
+            <div><button type="button" onclick="checkname()" id="nome_btn">Check</button></div>
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
       </div>
