@@ -7,15 +7,33 @@ var assert=require("assert");
 var db_ops=require("../mongodb/db_operations.js");
 var body_parser=require("body-parser");
 var mongoose = require("mongoose");
-var usermodel = require("./schemas/users");
+var usermodel = require("./schemas/user");
 var film = require("./schemas/film");
+var session = require("express-session");
+var file_store = require("session-file-store")(session);
+var passport = require("passport");
+
+var connection = mongoose.connect("mongodb://localhost:27017/cercafilm");
 
 var app = express();
 const wss=require("express-ws")(app);
 
+app.use(session({
+  name: "session-id",
+  secret: "12345678987654321",
+  saveUninitialized: false,
+  resave: false,
+  store: new file_store()
+}));
 
-var indexRouter = require('./routes/index');
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+var authRouter = require('./routes/auth');
 var findRouter = require("./routes/find");
+var profileRouter = require("./routes/profile");
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -25,10 +43,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(body_parser.json());
 
 
-app.use('/', indexRouter);
+app.use('/', authRouter);
 //app.use("/find", findRouter);
 
-
+app.use("/users",profileRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -42,7 +60,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
- // res.render('error');
+  res.send(err);
 });
 app.listen(3000,()=>{
   console.log("Listening...");

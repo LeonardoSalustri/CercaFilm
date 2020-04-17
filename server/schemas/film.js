@@ -26,17 +26,28 @@ var film_schema=new schema({
         type:[String],
         required:true,
     },
+    rating_esterno:{
+        type:Number,
+        min:0,
+        max:100,
+        default:0
+    },
     rating:{
         type:Number,
-        min:1,
-        max:5
+        min:0,
+        max:100,
+        default:0
     },
     votanti:{
         type:Number,
         required:true,
         default:0
     },
-    img: String
+    img: String,
+    trama:{
+        type:String,
+        default:""
+    }
 })
 
 var film_visti_schema=new schema({
@@ -79,10 +90,5 @@ var film_valutati_schema=new schema({
     }
 })
 
-var film=mongoose.model("film",film_schema);
-var film_visti=mongoose.model("film_visti",film_visti_schema);
-var film_valutati=mongoose.model("film_valutati",film_valutati_schema);
 
-module.exports = film;
-module.exports=film_visti;
-module.exports=film_valutati;
+module.exports = mongoose.model("film",film_schema);
