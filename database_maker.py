@@ -1,60 +1,109 @@
-import requests
-from bs4 import BeautifulSoup
-import re
+# -*- coding: utf-8 -*-
 import json
-import ftfy
+import requests
 from pymongo import MongoClient
+import re
 
-generi_list=['Animazione', 'Arte', 'Avventura', 'Azione', 'Balletto', 'Biografico', 'Catastrofico', 'Cofanetto', 'Comico', 'Commedia', 'Commedia a episodi', 'Commedia drammatica', 'Commedia musicale', 'Commedia nera', 'Commedia rosa', 'Commedia sentimentale', 'Concerto', 'Cortometraggio', 'Docu-fiction', 'Documentario', 'Documentario drammatico', 'Documentario musicale', 'Drammatico', 'Epico', 'Episodi', 'Erotico', 'Eventi', 'Family', 'Fantascienza', 'Fantastico', 'Fantasy', 'Farsesco', 'Fiabesco', 'Film a episodi', 'Film di montaggio', 'Giallo', 'Giallo rosa', 'Grottesco', 'Guerra', 'Hard', 'Hard boiled', 'Horror', 'Medico', 'Mitologico', 'Musical', 'Musicale', 'Muto', 'Noir', 'Non definito', 'Opera drammatica', 'Opera lirica', 'Politico', 'Poliziesco', 'Psicologico', 'Ragazzi', 'Religioso', 'Satirico', 'Sentimentale', 'Sociologico', 'Sperimentale', 'Spionaggio', 'Sportivo', 'Storico', 'Storico biografico', 'Teatro', 'Telefilm', 'Thriller', 'Western']
-film = {}
+esclusi = ["il","l","the","la","un","uno","una","gli","i","a","an","-","/","di","degli","dello","dei","delle","e","of",":","","le","lo",]
 client = MongoClient("mongodb://localhost:27017/")
 db = client.cercafilm
-for h in range(1,10):
-    if h == 1:
-        html = requests.get("https://www.mymovies.it/database/ricerca/avanzata/?titolo=&titolo_orig=&regista=&attore=&id_genere=-1&nazione=&clausola1=%3E%3D&anno_prod=1990&clausola2=%3E%3D&stelle=2&id_manif=-1&anno_manif=&disponib=-1&ordinamento=0&submit=Inizia+ricerca+%C2%BB")
-    else:
-        html = requests.get("https://www.mymovies.it/database/ricerca/avanzata/?titolo=&titolo_orig=&regista=&attore=&id_genere=-1&nazione=&clausola1=%3E%3D&anno_prod=1990&clausola2=%3E%3D&stelle=2&id_manif=-1&anno_manif=&disponib=-1&ordinamento=0&submit=Inizia+ricerca+%C2%BB&page="+str(h))
-    soup = BeautifulSoup(html.content,"html.parser")
-    titoli = soup.find_all("h2")
-    new_titoli=[]
-    trame=[]
-    dizionario_link_trame={}
-    for titolo in titoli:
-        new_titolo = titolo.a.text.encode("latin-1").decode("utf-8")
-        new_titoli.append(new_titolo)
-        dizionario_link_trame[new_titolo]=titolo.a.get("href")
-    descrizioni = soup.find_all(attrs={"class": "linkblu2"})
-    diz = {} 
-    lista_registi=[]
-    lista_attori=[]
-    cont = 0
-    for descrizione in descrizioni:
-        durata = re.search("Durata ([0-9]*)",str(descrizione))
-        for i in descrizione.b.find_all("a"):
-            new_i = i.text.encode("latin-1").decode("utf-8")
-            lista_registi.append(new_i)
-        diz["registi"]=lista_registi
-        for j in descrizione.find_all("a"):
-            new_j=j.text.encode("latin-1").decode("utf-8")
-            if new_j[0] in "1234567890":
-                diz["anno"]=new_j
-            elif new_j in generi_list:
-                diz["genere"]=new_j
-            elif new_j in lista_registi:
-                pass
-            else:
-                lista_attori.append(new_j)
-        diz["titolo"]=new_titoli[cont]
-        diz["attori"]=lista_attori
-        diz["durata"]=durata.group(1)
-        diz["trama"]=dizionario_link_trame[new_titoli[cont]]
-        db.films.insert_one(diz)
-        cont+=1
-        lista_registi=[]
-        lista_attori=[]
-        diz={}
-    print(str(round((float(h)/10*100),2))+"%")
-#json_film = json.dumps(film,ensure_ascii=False)
-#with open("C:/users/leosa/desktop/code/backend/cercafilm/film1.json", 'a', encoding='utf8') as json_file:
- #   json_file.write(json_film)
-#json_file.close()
+generi=requests.get("https://api.themoviedb.org/3/genre/movie/list?api_key=fdac8626cfc07400405316ea3cc0b001&language=it-IT")
+generi=generi.json()
+lista_generi=[]
+for i in generi["genres"]:
+    lista_generi.append(i["name"])
+discover = requests.get("https://api.themoviedb.org/3/discover/movie?api_key=fdac8626cfc07400405316ea3cc0b001&language=it-IT&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&year=2020&vote_average.gte=6")
+discover = discover.json()
+page=1
+fin = open("output.json","a")
+while page<=discover["total_pages"]:
+    for i in discover["results"]:
+        if i["vote_count"]>=100:
+            film_id = str(i["id"])
+            film_name = i["title"]
+            dizionario_film={}
+            film_details = requests.get("https://api.themoviedb.org/3/movie/"+film_id+"?api_key=fdac8626cfc07400405316ea3cc0b001&language=it").json()
+            dizionario_film["titolo"]=film_name
+            dizionario_film["anno"]=film_details["release_date"]
+            dizionario_film["durata"]=film_details["runtime"]
+            dizionario_film["produzione"]=film_details["production_countries"]
+            dizionario_film["genere"]=film_details["genres"]
+            dizionario_film["img"]=film_details["backdrop_path"]
+            dizionario_film["popolarita_esterna"]=film_details["popularity"]
+            credit = requests.get("https://api.themoviedb.org/3/movie/"+film_id+"/credits?api_key=fdac8626cfc07400405316ea3cc0b001&language=it").json()
+            crew=credit["crew"]
+            cast=credit["cast"]
+            dizionario_film["registi"]=[]
+            dizionario_film["sceneggiatori"]=[]
+            dizionario_film["autori"]=[]
+            dizionario_film["attori"]=[]
+            dizionario_film["trama"]=film_details["overview"]
+            dizionario_film["titolo_query"]=""
+            for h in crew:
+                if h["job"]=="Director":
+                    if h["profile_path"]:
+                        direttore={
+                            "nome":h["name"],
+                            "img":h["profile_path"]
+                        }
+                    else:
+                        direttore={
+                            "nome":h["name"]
+                        }
+                    dizionario_film["registi"].append(direttore)
+                if h["job"]=="Screenplay":
+                    if h["profile_path"]:
+                        sceneggiatore={
+                            "nome":h["name"],
+                            "img":h["profile_path"]
+                        }
+                    else:
+                        sceneggiatore={
+                            "nome":h["name"]
+                        }
+                    dizionario_film["sceneggiatori"].append(sceneggiatore)
+                if h["job"]=="Writer":
+                    if h["profile_path"]:
+                        autore={
+                            "nome":h["name"],
+                            "img":h["profile_path"]
+                        }
+                    else:
+                        autore={
+                            "nome":h["name"]
+                        }
+                    dizionario_film["autori"].append(autore)
+            for j in cast:
+                if j["order"]<=5:
+                    if j["profile_path"]:
+                        attore = {
+                            "nome":j["name"],
+                            "img":j["profile_path"]
+                        }
+                    else:
+                        attore = {
+                            "nome":j["name"]
+                        }
+                    dizionario_film["attori"].append(attore)
+            
+            dizionario_film["rating_esterno"]={
+                "rating":film_details["vote_average"],
+                "votanti":film_details["vote_count"]
+            }
+            delimiters = " ","-",":","'","|","/",",",".","\n","*"
+            regexPattern = '|'.join(map(re.escape, delimiters))
+            splitted = re.split(regexPattern,dizionario_film["titolo"].lower())
+            nuova=[]
+            for i in range(0,len(splitted)):
+                if splitted[i] not in esclusi:
+                    if i!=len(splitted)-1:
+                        dizionario_film["titolo_query"]+=splitted[i]+" "
+                    else:
+                        dizionario_film["titolo_query"]+=splitted[i]
+            db.films.insert_one(dizionario_film)
+    page+=1
+    if page==3:
+        break
+    discover = requests.get("https://api.themoviedb.org/3/discover/movie?api_key=fdac8626cfc07400405316ea3cc0b001&language=it-IT&sort_by=popularity.desc&include_adult=false&include_video=false&page="+str(page)+"&year=2020&vote_average.gte=6").json()
+
+    ##db.films.insert_one(dizionario_film)

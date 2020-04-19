@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 var schema = mongoose.Schema;
 var films=require("./film");
+var film_valutati = require("./film_valutati")
 var passport = require("passport");
 var passport_local_mongoose = require("passport-local-mongoose")
 
@@ -12,8 +13,7 @@ var userschema = new schema(
         unique: true
       },
       generi:[{type:String,default:[]}],
-      film_visti: [ {type:schema.Types.ObjectId,ref:"film_visti",default:[]}],
-      film_valutati: [{type:schema.Types.ObjectId,ref:"film_valutati",default:[]}]
+      film_valutati: [{type:schema.Types.Mixed,ref:"film_valutati",default:[]}]
     },{
     timestamps: true
     }

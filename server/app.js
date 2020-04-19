@@ -13,7 +13,8 @@ var session = require("express-session");
 var file_store = require("session-file-store")(session);
 var passport = require("passport");
 
-var connection = mongoose.connect("mongodb://localhost:27017/cercafilm");
+mongoose.set("useCreateIndex",true);
+mongoose.connect("mongodb://localhost:27017/cercafilm");
 
 var app = express();
 const wss=require("express-ws")(app);
@@ -33,6 +34,7 @@ app.use(passport.session());
 var authRouter = require('./routes/auth');
 var findRouter = require("./routes/find");
 var profileRouter = require("./routes/profile");
+var homeRouter = require("./routes/home");
 
 
 app.use(logger('dev'));
@@ -43,8 +45,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(body_parser.json());
 
 
-app.use('/', authRouter);
-//app.use("/find", findRouter);
+app.use('/auth', authRouter);
+
+app.use("/",homeRouter);
 
 app.use("/users",profileRouter);
 // catch 404 and forward to error handler
@@ -59,8 +62,8 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500);
-  res.send(err);
+  res.end(err.message);
+
 });
 app.listen(3000,()=>{
   console.log("Listening...");

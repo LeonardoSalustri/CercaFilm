@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="it">
   <head>
@@ -19,29 +20,24 @@
   
 
   <body>
-    <script>
-            const ws = new WebSocket("ws://localhost:3000/users/profile/ws");
-            ws.onopen=()=>{
-                ws.send("get_info");
-            };
+
+      <script>
+          var ws = new WebSocket("ws://localhost:3000/ws");
+          ws.onopen=()=>{
+                console.log("Connessione stabilita");
+          };
+          function invia_preferenze(){
+            var messaggio = document.getElementById("film1").value+"/"+document.getElementById("rating1").value;
+            ws.send(messaggio);
             ws.onmessage=(msg)=>{
-                console.log(msg.data);
-                document.getElementById("user_info").innerHTML=msg.data;
+                if (msg.data==="error"){
+                    location.reload();
+                }
             };
-        
-        function cercafilm(){
-            ws.send(document.getElementById("nome_film").value);
-            ws.onmessage=(msg)=>{
-              document.getElementById("film_result").innerHTML="";
-                console.log(msg.data.toString());
-                var content = JSON.parse(msg.data);
-                console.log(content);
-                for(var i = 0;i<content.results;i++){
-                    document.getElementById("film_result").innerHTML=document.getElementById("film_result").innerHTML+JSON.stringify(content.content[i]);
-            }
-        };
         }
-    </script>
+      </script>
+
+
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
       <a class="navbar-brand" href="#">CercaFilm</a>
@@ -63,31 +59,13 @@
 
     <main role="main" class="container">
 
-        <div class="starter-template">
-            <br><br>
-            <p id = "user_info"></p>
-        </div>
-  
-      </main>
-
-    <main role="main" class="container">
-
       <div class="starter-template">
-            <div class="form-group">
-              <label for="film">Nome film</label>
-                <input type="film" class="form-control" id="nome_film" name="nome_film">
-                <small id="nome_film" class="form-text text-muted"></small>
-            </div>
-          <button type="button" class="btn btn-primary" onclick="cercafilm()">Cerca</button>
+        <input id ="film1" type="text">Titolo film</input><input id ="rating1" type="text">Rating</input><br>
+        <br>
+        <button onclick="invia_preferenze()"type="button">Invia</button>
       </div>
 
     </main><!-- /.container -->
-
-    <main role="main" class="container">
-        <div class="starter-template">
-            <p id = film_result></p>
-        </div>
-    </main>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

@@ -10,25 +10,17 @@ var passport = require("passport");
 var local_strategy = require("passport-local").Strategy;
 
 
-//var connection = mongoose.connect("mongodb://localhost:27017/cercafilm");
-
 
 passport.use(new local_strategy(users.authenticate()));
 passport.serializeUser(users.serializeUser());
 passport.deserializeUser(users.deserializeUser());
 
 
-router_auth.route("/")
-.get((req,res,next)=>{
-  res.statusCode=200;
-  res.setHeader("Content-Type","text/html");
-  res.send("<h1>Benvenuto sulla pagina principale</h1>")
-});
 router_auth.route("/registration")
 .get((req,res,next)=>{
-  if(!req.session.user){
+  if(!req.user){
     res.statusCode=200;
-    res.setHeader("Content-type","text/html");
+    res.setHeader("Content-Type","text/html");
     res.sendFile(path.resolve(__dirname+"/../public/html/registration.html"));
   }
   else{
@@ -46,6 +38,7 @@ router_auth.route("/registration")
     }
     else{
       res.statusCode=200;
+      res.setHeader("Content-Type","application/json");
       res.json({message:"you are registered"});
     }
   })
@@ -53,6 +46,8 @@ router_auth.route("/registration")
 router_auth.route("/login")
 .get((req,res,next)=>{
   if(!req.user){
+    res.statusCode=200;
+    res.setHeader("Content-Type","text/html");
     res.sendFile(path.resolve(__dirname+"/../public/html/login.html"));
   }
   else{
@@ -71,8 +66,8 @@ router_auth.route("/logout")
 .get((req,res,next)=>{
   if(!req.user){
     var err = new Error("You are not logged in");
-    res.setHeader("Content-Type","application/json");
     res.statusCode=500;
+    res.setHeader("Content-Type","application/json");
     res.json({err:err});
   }
   else{
@@ -81,7 +76,7 @@ router_auth.route("/logout")
         console.log(err);
       }
       res.clearCookie("session-id");
-      res.redirect("/login");
+      res.redirect("/auth/login");
     });
   }
 })
