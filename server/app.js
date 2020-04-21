@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+var http=require("http");
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -17,7 +18,8 @@ mongoose.set("useCreateIndex",true);
 mongoose.connect("mongodb://localhost:27017/cercafilm");
 
 var app = express();
-const wss=require("express-ws")(app);
+var server = http.createServer(app);
+const wss=require("express-ws")(app,server);
 
 app.use(session({
   name: "session-id",
@@ -65,6 +67,6 @@ app.use(function(err, req, res, next) {
   res.end(err.message);
 
 });
-app.listen(3000,()=>{
+server.listen(3000,()=>{
   console.log("Listening...");
 });
