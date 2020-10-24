@@ -1,8 +1,16 @@
-body {
+.body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
-
-a {
+.starter{
+  margin-top: 50px;
+}
+.my_navbar{
+  background-color: blueviolet;
+}
+.brand{
+  font-size: x-large;
+}
+.a {
   color: #00B7FF;
 }

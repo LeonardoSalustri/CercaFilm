@@ -1,8 +1,12 @@
 var mongoose = require("mongoose");
 var schema = mongoose.Schema;
 var attori = require("./attore.js");
+var generi =  require("./genere.js");
 
 var film_schema=new schema({
+    _id:{
+        type:schema.Types.Number,
+    },
     titolo:{
         type:String,
         required:true,
@@ -16,32 +20,29 @@ var film_schema=new schema({
         required:true,
     },
     produzione:{
-        type:String,
-        default:""
+        type:[schema.Types.String],
+        default:[]
     },
     genere:{
-        type:[String],
-        required:true,
+        type:[{type:schema.Types.Number,ref:"generi"}],
+        deafult:[]
     },
     registi:{
-        type:[schema.Types.Mixed],
-        ref:"registi",
-        required:true,
+        type:[{type:schema.Types.Number,ref:"registi"}],
+        default:[]
     },
     sceneggiatori:{
-        type:[schema.Types.Mixed],
-        ref:"sceneggiatori",
+        type:[{type:schema.Types.Number,ref:"sceneggiatori"}],
         default:[]
     },
     autori:{
-        type:[schema.Types.Mixed],
-        ref:"autori",
+        type:[{type:schema.Types.Number,ref:"autori"}],
         default:[]
     },
     attori:{
-        type:[schema.Types.Mixed],
-        ref:"attori",
-        required:true},
+        type:[{type:schema.Types.Number,ref:"attori"}],
+        default:[]
+    },
     rating_esterno:{
         rating:{
             type:Number,
@@ -56,6 +57,10 @@ var film_schema=new schema({
         type:Number,
         default:0
     },
+    popolarità_interna:{
+        type:Number,
+        default:0
+    },
     rating_interno:{
         rating:{
             type:Number,
@@ -66,16 +71,17 @@ var film_schema=new schema({
         votanti:{
             type:Number,
             default:0
-        }
-    },
-    popolarità_interna:{
-        type:Number,
-        default:0
+        },
+        default:{rating:0,votanti:0}
     },
     img: String,
     trama:{
         type:String,
         default:""
+    },
+    keywords:{
+        type:[{type:schema.Types.Number,ref:"keywords"}],
+        default:[]
     }
 });
 

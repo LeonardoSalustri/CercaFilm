@@ -22,7 +22,7 @@
   <body>
 
     <script>
-      var ws = new WebSocket("ws://localhost:3000/ws"); 
+      var ws = new WebSocket("wss://localhost:3443/auth/ws"); 
       ws.onopen=()=>{
         console.log("Websocket open");
       };
@@ -70,27 +70,25 @@
   }
     </script>
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">CercaFilm</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+<nav class=" navbar navbar-expand-md navbar-dark bg-dark fixed-top ">
+  <a class="navbar-brand brand" href="#">CercaFilm</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">About Us</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+  
+  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active ">
+        <a class="nav-link" href="/">Home </a>
+      </li>
+    </ul>
+  </div>
+</nav>
 
     <main role="main" class="container">
 
-      <div class="starter-template">
+      <div class="starter-template " style = "padding:100px">
         <form action="/auth/registration" method="POST">
             <div class="form-group">
               <label for="username">Nome Utente</label>
@@ -102,7 +100,7 @@
             <div class="form-group">
               <label for="email">Email address</label>
               <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email">
-              <small id="emailHelp" class="form-text text-muted">Non condivideremo mai la tua e-mail con quaalcuno.</small>
+              <small id="emailHelp" class="form-text text-muted">Non condivideremo mai la tua e-mail con qualcuno.</small>
             </div>
             <div class="form-group">
               <label for="password">Password</label>
@@ -124,9 +122,14 @@
               <label class="form-check-label" for="donna">
                 Donna
               </label>
+              
             </div>
-            <div><button type="button" onclick="checkname()" id="nome_btn">Check</button></div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <div class = row style="padding:15px ;margin-top:40px">
+              <button class = "btn btn-secondary" type="button" onclick="checkname()" id="nome_btn">Check</button>
+            </div>
+            <div class = "row justify-content-end" style = margin-right:12px>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
           </form>
       </div>
 

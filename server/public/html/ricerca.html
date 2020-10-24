@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="it">
   <head>
@@ -20,6 +19,7 @@
   
 
   <body>
+
     <nav class=" navbar navbar-expand-md navbar-dark bg-dark fixed-top ">
       <a class="navbar-brand brand" href="#">CercaFilm</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,7 +33,7 @@
             <a class="nav-link" href="/">Home </a>
           </li>
           <li class="nav-item">
-            <a id = "profilo" class="nav-link" href="/user">Profilo</a>
+            <a class="nav-link" href="/aboutus">About Us</a>
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
@@ -48,18 +48,44 @@
       </div>
     </nav>
 
-    <script src="../javascripts/log.js"></script>
-      
-    </script>
-
     <main role="main" class="container">
 
-      <div class="starter-template">
-        <h1>Benvenuto nella pagina iniziale</h1>
-      </div>
+        <div class="starter-template">
+            <form action="/find/personalizzata" method="POST">
+                <div class="form-group">
+                  <label for="ricerca"></label>
+                    <input type="text" class="form-control form-control-lg" id="ricerca" name="ricerca" placeholder="Titolo">
+                    <small id="Ricerca" class="form-text text-muted"></small>
+                </div>
+                <div class="form-group">
+                  <label for="language_selection">Language</label>
+                  <select class="form-control" name="lingua">
+                    <option value = "italiano">Italiano</option>
+                    <option value = "english">English</option>
+                  </select>
+                  <select class="form-control" name="anno" id="anno">
+                    <option value=""></option>
+                  </select>
+                </div><br><br><br>
+                <button class="btn btn-primary mb-2">Cerca</button>
+              </form>
+          </div>
+    </main>
 
-    </main><!-- /.container -->
+    <script>
+      for (var i = 1950;i<=2020;i++){
+        // get reference to select element
+        var sel = document.getElementById("anno");
+        // create new option element
+        var opt = document.createElement('option');
 
+        // create text node to add to option element (opt)
+        opt.text=i.toString();
+
+        // add opt to end of select box (sel)
+        sel.add(opt);
+      }
+    </script>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->

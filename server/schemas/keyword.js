@@ -1,17 +1,14 @@
 var mongoose = require("mongoose");
 var schema = mongoose.Schema;
+var attori = require("./attore.js");
 
-var sceneggiatore_schema = new schema({
+var keyword_schema = new schema({
     _id:{
         type:schema.Types.Number,
     },
-    nome:{
+    name:{
         type:String,
-        required:true
-    },
-    img:{
-        type:String,
-        default:""
+        required:true,
     },
     film:{
         type:[{type:schema.Types.Number,ref:"films"}],
@@ -19,4 +16,5 @@ var sceneggiatore_schema = new schema({
     }
 });
 
-module.exports = mongoose.model("sceneggiatori",sceneggiatore_schema);
+
+module.exports = mongoose.model("keyword",keyword_schema);
